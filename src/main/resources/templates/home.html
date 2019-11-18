@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="include/userHeader::html('主页')" ></head>
+<body>
+<div th:replace="include/userTop::html" ></div>
+<script>
+    $(function(){
+        var data4Vue = {
+            uri:'listNearbyInfos',
+            location:'',
+            beans: []
+        };
+
+        //ViewModel
+        var vue = new Vue({
+            el: '#workingArea',
+            data: data4Vue,
+            methods: {
+                list:function(){
+                    if(!checkEmpty(this.location, "location"))
+                        return;
+                    var url =  this.uri+"?location="+this.location;
+                    axios.get(url).then(function(response) {
+                        vue.beans = response.data.data.infos;
+                    });
+                },
+                logout:function(){
+                    var url =  'logout';
+                    axios.post(url,this.user).then(function(response) {
+                        var result = response.data;
+                        if (result.status == "success") {
+                            location.href="home";
+                        } else {
+                            alert(result.message)
+                        }
+                    })
+                }
+
+            }
+        });
+
+        Vue.filter('formatDateFilter', function (value, formatString) {
+            if(null==value)
+                return "";
+            formatString = formatString || 'YYYY-MM-DD HH:mm:ss';
+            return moment(value).format(formatString);
+        });
+    });
+
+</script>
+<div id="workingArea" >
+    <span th:if="${null!=session.user}">
+        <a href="#nowhere" @click="logout">退出</a>
+    </span>
+    <br>
+    <br>
+
+    <div class="panel-body">
+        <table class="addTable">
+            <tr>
+                <td>坐标:</td>
+                <td><input  v-model.trim="location" type="text" class="form-control"></td>
+            </tr>
+            <tr class="submitTR">
+                <td colspan="2" align="center">
+                    <a href="#nowhere"  @click="list" class="btn btn-success">查看定位附近的停车场</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="listDataTableDiv">
+        <table class="table table-striped table-bordered table-hover  table-condensed">
+            <thead>
+            <tr class="success">
+                <th>ID</th>
+                <th>图片</th>
+                <th>车位名称</th>
+                <th>坐标</th>
+                <th>提交时间</th>
+                <th>状态</th>
+                <th>跳转到详情</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="bean in beans ">
+                <td>{{bean.id}}</td>
+                <td>
+                    <img height="40px"  :src="'static/img/info/'+bean.id+'.jpg'">
+                </td>
+                <td>
+                    {{bean.name}}
+                </td>
+                <td>
+                    {{bean.location}}
+                </td>
+                <td>
+                    {{bean.infoSubmitDate  | formatDateFilter}}
+                </td>
+                <td>{{bean.state}}</td>
+                <td>
+                    <a :href="'/parking_info/info_detail?pid=' + bean.id" >详情</span></a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div th:replace="include/userFooter::html" ></div>
+</body>
+</html>

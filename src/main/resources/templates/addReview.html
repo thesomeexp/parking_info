@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="include/userHeader::html('添加评价')" ></head>
+<body>
+<script>
+    $(function(){
+        var data4Vue = {
+            uri:'addReview',
+            bean:{pid:'', accuracy:'', easyToFind:'', content:''}
+        };
+
+        //ViewModel
+        var vue = new Vue({
+            el: '#workingArea',
+            data: data4Vue,
+            mounted:function(){ //mounted　表示这个 Vue 对象加载成功了
+
+            },
+            methods: {
+                add: function () {
+                    if(!checkEmpty(this.bean.pid, "pid"))
+                        return;
+                    if(!checkEmpty(this.bean.accuracy, "accuracy"))
+                        return;
+                    if(!checkEmpty(this.bean.easyToFind, "easyToFind"))
+                        return;
+                    if(!checkEmpty(this.bean.content, "content"))
+                        return;
+                    var url = this.uri;
+                    //axios.js 上传文件要用 formData 这种方式
+                    var formData = new FormData();
+                    formData.append("pid", this.bean.pid);
+                    formData.append("accuracy", this.bean.accuracy);
+                    formData.append("easyToFind", this.bean.easyToFind);
+                    formData.append("content", this.bean.content);
+                    axios.post(url,formData).then(function(response){
+                        vue.bean = {pid:'',accuracy:'',easyToFind:'',content:''};
+                    });
+                }
+
+            }
+        });
+    });
+
+</script>
+<div id="workingArea" >
+    <br>
+
+    <div class="panel panel-warning addDiv">
+        <div class="panel-heading">新增停车场评价</div>
+        <div class="panel-body">
+            <table class="addTable">
+                <tr>
+                    <td>停车场id</td>
+                    <td><input  @keyup.enter="add" v-model.trim="bean.pid" type="text" class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>定位精确度评分</td>
+                    <td><input  @keyup.enter="add" v-model.trim="bean.accuracy" type="text" class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>停车场易找程度</td>
+                    <td><input  @keyup.enter="add" v-model.trim="bean.easyToFind" type="text" class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>评论(3000字以内)</td>
+                    <td><input  @keyup.enter="add" v-model.trim="bean.content" type="text" class="form-control"></td>
+                </tr>
+                <tr class="submitTR">
+                    <td colspan="2" align="center">
+                        <a href="#nowhere"  @click="add" class="btn btn-success">提交</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <br>
+</div>
+<div th:replace="include/userFooter::html" ></div>
+</body>
+</html>

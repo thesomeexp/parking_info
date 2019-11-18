@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="include/userHeader::html('登录')" ></head>
+<body>
+<script>
+    $(function() {
+        var data4Vue = {
+            uri: 'login',
+            result: [],
+            user: {phone: '', password: ''}
+        };
+
+        //ViewModel
+        var vue = new Vue({
+            el: '#workingArea',
+            data: data4Vue,
+            methods: {
+                login:function(){
+                    var url =  this.uri;
+                    var formData = new FormData();
+                    formData.append("phone", this.user.phone);
+                    formData.append("password", this.user.password);
+                    axios.post(url, formData).then(function(response) {
+                        var result = response.data;
+                        if (result.status == "success") {
+                            location.href="home";
+                        } else {
+                            alert(result.message)
+                        }
+                    })
+                }
+
+
+            }
+        })
+    })
+
+</script>
+<div id="workingArea" >
+    <br>
+
+    <div class="panel panel-warning addDiv">
+        <div class="panel-body">
+            <table class="addTable">
+                <tr>
+                    <td>手机号</td>
+                    <td><input  v-model.trim="user.phone" type="text" class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>密码</td>
+                    <td><input  v-model.trim="user.password" type="text" class="form-control"></td>
+                </tr>
+                <tr class="submitTR">
+                    <td colspan="1" align="center">
+                        <a href="register" class="btn btn-success">注册</a>
+                    </td>
+                    <td colspan="1" align="center">
+                        <a href="#nowhere"  @click="login" class="btn btn-success">登录</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <br>
+</div>
+<div th:replace="include/userFooter::html" ></div>
+</body>
+</html>

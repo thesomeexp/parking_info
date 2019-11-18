@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="include/userHeader::html('查看车位图片信息')" ></head>
+<body>
+<script>
+    $(function(){
+        var data4Vue = {
+            uri:'listInfoImages',
+            pid:'',
+            beans: []
+        };
+
+        //ViewModel
+        var vue = new Vue({
+            el: '#workingArea',
+            data: data4Vue,
+            methods: {
+                list:function(){
+                    if(!checkEmpty(this.pid, "pid"))
+                        return;
+                    var url =  this.uri+ "?pid="+this.pid;
+                    axios.get(url).then(function(response) {
+                        vue.beans = response.data;
+                    });
+                }
+            }
+        });
+        Vue.filter('formatDateFilter', function (value, formatString) {
+            if(null==value)
+                return "";
+            formatString = formatString || 'YYYY-MM-DD HH:mm:ss';
+            return moment(value).format(formatString);
+        });
+    });
+
+</script>
+<div id="workingArea" >
+    <br>
+    <br>
+
+    <div class="panel-body">
+        <table class="addTable">
+            <tr>
+                <td>pid:</td>
+                <td><input  v-model.trim="pid" type="text" class="form-control"></td>
+            </tr>
+            <tr class="submitTR">
+                <td colspan="2" align="center">
+                    <a href="#nowhere"  @click="list" class="btn btn-success">查看该类所有图片</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="listDataTableDiv">
+        <table class="table table-striped table-bordered table-hover  table-condensed">
+            <thead>
+            <tr class="success">
+                <th>图片ID</th>
+                <th>首页图片</th>
+                <th>车位pid</th>
+                <th>提交用户uid</th>
+                <th>提交时间</th>
+                <th>唯一不同的详情图片</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="bean in beans ">
+                <td>{{bean.id}}</td>
+                <td>
+                    <img height="40px"  :src="'img/info/'+bean.pid+'.jpg'">
+                </td>
+                <td>
+                    {{bean.pid}}
+                </td>
+                <td>
+                    {{bean.uid}}
+                </td>
+                <td>
+                    {{bean.submitDate | formatDateFilter}}
+                </td>
+                <td>
+                    <img height="40px"  :src="'img/info/'+ bean.pid + '/' + bean.id + '.jpg'">
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div th:replace="include/userFooter::html" ></div>
+</body>
+</html>

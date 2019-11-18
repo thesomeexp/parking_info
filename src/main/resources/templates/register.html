@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="include/userHeader::html('注册')" ></head>
+<body>
+<script>
+    $(function() {
+        var data4Vue = {
+            uri: 'register',
+            result: [],
+            user: {name: '', password: '', repeatpassword: '', phone: ''}
+        };
+
+        //ViewModel
+        var vue = new Vue({
+            el: '#workingArea',
+            data: data4Vue,
+            methods: {
+                register: function () {
+                    var url = this.uri;
+                    if (this.user.password != this.user.repeatpassword) {
+                        alert("两次密码不相等")
+                        return;
+                    }
+                    var formData = new FormData();
+                    formData.append("name", this.user.name);
+                    formData.append("password", this.user.password);
+                    formData.append("phone", this.user.phone);
+                    axios.post(url, formData).then(function (response) {
+                        var result = response.data;
+                        if (result.status == "success") {
+                            alert("注册成功");
+                            vue.user= {name: '', password: '', repeatpassword: '', phone: ''}
+                        } else {
+                            alert("注册失败:" + result.message);
+                        }
+                    });
+                }
+            }
+        })
+    })
+
+</script>
+<div id="workingArea" >
+    <br>
+
+    <div class="panel panel-warning addDiv">
+        <div class="panel-body">
+            <table class="addTable">
+                <tr>
+                    <td>用户名(注册后无法修改)</td>
+                    <td><input  v-model.trim="user.name" type="text" class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>密码</td>
+                    <td><input  v-model.trim="user.password" type="text" class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>确认密码</td>
+                    <td><input  v-model.trim="user.repeatpassword" type="text" class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>手机号</td>
+                    <td><input  v-model.trim="user.phone" type="text" class="form-control"></td>
+                </tr>
+                <tr class="submitTR">
+                    <td colspan="2" align="center">
+                        <a href="#nowhere"  @click="register" class="btn btn-success">注册</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <br>
+</div>
+<div th:replace="include/userFooter::html" ></div>
+</body>
+</html>

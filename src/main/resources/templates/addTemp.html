@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="include/userHeader::html('添加评价')" ></head>
+<body>
+<script>
+    $(function(){
+        var data4Vue = {
+            uri:'addTemp',
+            pid:'',
+            location:'',
+            state:''
+        };
+
+        //ViewModel
+        var vue = new Vue({
+            el: '#workingArea',
+            data: data4Vue,
+            mounted:function(){ //mounted　表示这个 Vue 对象加载成功了
+
+            },
+            methods: {
+                add: function () {
+                    var url = this.uri;
+                    //axios.js 上传文件要用 formData 这种方式
+                    var formData = new FormData();
+                    formData.append("pid", this.pid);
+                    formData.append("location", this.location);
+                    formData.append("state", this.state);
+                    axios.post(url,formData).then(function(response){
+                        var result = response.data;
+                        if (result.status == "success") {
+                            vue.bean = {pid:'',location:'', state:''};
+                        } else {
+                            alert("提交失败:" + result.message);
+                        }
+                    });
+                }
+
+            }
+        });
+    });
+
+</script>
+<div id="workingArea" >
+    <br>
+
+    <div class="panel panel-warning addDiv">
+        <div class="panel-heading">新增停车场temp状态</div>
+        <div class="panel-body">
+            <table class="addTable">
+                <tr>
+                    <td>停车场id</td>
+                    <td><input  @keyup.enter="add" v-model.trim="pid" type="text" class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>用户坐标</td>
+                    <td><input  @keyup.enter="add" v-model.trim="location" type="text" class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>用户提交的拥挤度(0-10)</td>
+                    <td><input  @keyup.enter="add" v-model.trim="state" type="text" class="form-control"></td>
+                </tr>
+                <tr class="submitTR">
+                    <td colspan="2" align="center">
+                        <a href="#nowhere"  @click="add" class="btn btn-success">提交</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <br>
+</div>
+<div th:replace="include/userFooter::html" ></div>
+</body>
+</html>

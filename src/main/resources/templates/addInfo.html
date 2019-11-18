@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="include/userHeader::html('添加车位')" ></head>
+<body>
+<script>
+    $(function(){
+        var data4Vue = {
+            uri:'addInfo',
+            info:{name:'', location:'', content:''},
+            file:null
+        };
+
+        //ViewModel
+        var vue = new Vue({
+            el: '#workingArea',
+            data: data4Vue,
+            mounted:function(){ //mounted　表示这个 Vue 对象加载成功了
+
+            },
+            methods: {
+                add: function () {
+                    var url = this.uri;
+                    //axios.js 上传文件要用 formData 这种方式
+                    var formData = new FormData();
+                    formData.append("name", this.info.name);
+                    formData.append("content", this.info.content);
+                    formData.append("location", this.info.location);
+                    formData.append("image", this.file);
+                    axios.post(url,formData).then(function(response){
+                        vue.info = {name:'', location:'', content:''};
+                        $("#infoPic").val('');
+                        vue.file = null;
+                    });
+                },
+                getFile: function (event) { //选中本地文件就会保存到data4Vue.file
+                    this.file = event.target.files[0];
+                }
+
+            }
+        });
+    });
+
+</script>
+<div id="workingArea" >
+    <br>
+
+    <div class="panel panel-warning addDiv">
+        <div class="panel-heading">新增停车场</div>
+        <div class="panel-body">
+            <table class="addTable">
+                <tr>
+                    <td>停车场名称</td>
+                    <td><input  @keyup.enter="add" v-model.trim="info.name" type="text" class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>停车场描述</td>
+                    <td><input  @keyup.enter="add" v-model.trim="info.content" type="text" class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>坐标</td>
+                    <td><input  @keyup.enter="add" v-model.trim="info.location" type="text" class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>停车场图片</td>
+                    <td>
+                        <input id="infoPic" accept="image/*" type="file" name="image" @change="getFile($event)" />
+                    </td>
+                </tr>
+                <tr class="submitTR">
+                    <td colspan="2" align="center">
+                        <a href="#nowhere"  @click="add" class="btn btn-success">提交</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <br>
+</div>
+<div th:replace="include/userFooter::html" ></div>
+</body>
+</html>
