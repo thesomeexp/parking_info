@@ -1,12 +1,16 @@
 package com.someexp.parking_info.config;
 
+import com.someexp.parking_info.pojo.User;
 import com.someexp.parking_info.realm.JPARealm;
 import com.someexp.parking_info.util.MagicVariable;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,6 +48,7 @@ public class ShiroConfiguration {
         filterMap.put("/listNearbyInfos", "anon");
         // 放行的静态资源, 首张图片, css, js文件等
         filterMap.put("/static/**", "anon");
+
         // 验证才能访问的静态资源, 详情图片等
         filterMap.put("/data/**", "authc");
 
@@ -72,6 +77,7 @@ public class ShiroConfiguration {
         return securityManager;
     }
 
+    // 负责用户的认证和权限的处理
     @Bean
     public JPARealm getJPARealm(){
         JPARealm myShiroRealm = new JPARealm();
@@ -79,6 +85,7 @@ public class ShiroConfiguration {
         return myShiroRealm;
     }
 
+    // 对密码进行编码的，防止密码在数据库里明码保存
     @Bean
     public HashedCredentialsMatcher hashedCredentialsMatcher(){
         HashedCredentialsMatcher hashedCredentialsMatcher = new HashedCredentialsMatcher();
