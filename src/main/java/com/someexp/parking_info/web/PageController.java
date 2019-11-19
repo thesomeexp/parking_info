@@ -43,40 +43,40 @@ public class PageController {
     // post: addInfo
     @GetMapping(value="/add_info")
     public String addInfo(){
-        return "addInfo";
+        return "fore/addInfo";
     }
 
     // 提交停车场详情图片页面
     // post: addInfoImage
     @GetMapping(value="/add_info_image")
     public String addInfoImage(){
-        return "addInfoImage";
+        return "fore/addInfoImage";
     }
 
     // 测试页面  查看停车场所有图片
     // get: listInfoImages
     @GetMapping(value="/list_info_images")
     public String listInfoImages(){
-        return "listInfoImages";
+        return "fore/listInfoImages";
     }
 
     // 我提交的停车场信息页面
     // get: mySubmitInfos
     @GetMapping(value="/my_submit_infos")
     public String mySubmitInfos(){
-        return "mySubmitInfos";
+        return "fore/mySubmitInfos";
     }
     @GetMapping(value="/add_review")
     public String addReview(){
-        return "addReview";
+        return "fore/addReview";
     }
     @GetMapping(value="/info_detail")
     public String infoDetail(){
-        return "infoDetail";
+        return "fore/infoDetail";
     }
     @GetMapping(value="/add_temp")
     public String addTemp(){
-        return "addTemp";
+        return "fore/addTemp";
     }
 
 

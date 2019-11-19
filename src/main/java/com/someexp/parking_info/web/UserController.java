@@ -1,5 +1,6 @@
 package com.someexp.parking_info.web;
 
+import com.someexp.parking_info.util.CSRFTokenUtil;
 import com.someexp.parking_info.util.MagicVariable;
 import com.someexp.parking_info.util.MyTools;
 import com.someexp.parking_info.pojo.User;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.HtmlUtils;
 
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 public class UserController {
@@ -96,8 +99,13 @@ public class UserController {
             // 3.执行登录方法
             subject.login(token);
             User user = (User)subject.getPrincipal();
+            String csrfToken = CSRFTokenUtil.generate();
             session.setAttribute("user", user);
-            return Result.success(MagicVariable.LOGIN_SUCCESS);
+            session.setAttribute("_csrf_token", csrfToken);
+
+            Map<String, String> map = new HashMap<>();
+            map.put("_csrf_token", csrfToken);
+            return Result.success(map);
         } catch (UnknownAccountException e){
             // 登录失败用户名不存在
             return Result.fail(MagicVariable.USER_PHONE_NOT_EXIST);

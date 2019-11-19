@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-<head th:include="include/userHeader::html('主页')" ></head>
+<head th:include="include/fore/userHeader::html('主页')" ></head>
 <body>
-<div th:replace="include/userTop::html" ></div>
+<div th:replace="include/fore/userTop::html" ></div>
 <script>
     $(function(){
         var data4Vue = {
@@ -27,7 +27,10 @@
                 },
                 logout:function(){
                     var url =  'logout';
-                    axios.post(url,this.user).then(function(response) {
+                    axios.post(url,
+                        this.user,
+                        {headers: {"_csrf_token": window.localStorage.getItem("_csrf_token")}}
+                    ).then(function(response) {
                         var result = response.data;
                         if (result.status == "success") {
                             location.href="home";
@@ -107,6 +110,6 @@
         </table>
     </div>
 </div>
-<div th:replace="include/userFooter::html" ></div>
+<div th:replace="include/fore/userFooter::html" ></div>
 </body>
 </html>

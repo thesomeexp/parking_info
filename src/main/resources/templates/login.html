@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-<head th:include="include/userHeader::html('登录')" ></head>
+<head th:include="include/fore/userHeader::html('登录')" ></head>
 <body>
 <script>
     $(function() {
@@ -23,7 +23,10 @@
                     formData.append("password", this.user.password);
                     axios.post(url, formData).then(function(response) {
                         var result = response.data;
+                        var _csrf_token = result.data._csrf_token;
                         if (result.status == "success") {
+                            alert(_csrf_token)
+                            window.localStorage.setItem("_csrf_token", _csrf_token);
                             location.href="home";
                         } else {
                             alert(result.message)
@@ -65,6 +68,6 @@
 
     <br>
 </div>
-<div th:replace="include/userFooter::html" ></div>
+<div th:replace="include/fore/userFooter::html" ></div>
 </body>
 </html>

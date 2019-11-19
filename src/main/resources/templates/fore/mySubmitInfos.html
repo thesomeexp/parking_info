@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-<head th:include="include/userHeader::html('我提交的车位信息')" ></head>
+<head th:include="include/fore/userHeader::html('我提交的车位信息')" ></head>
 <body>
 <script>
     $(function(){
@@ -107,8 +107,8 @@
             </tbody>
         </table>
     </div>
-    <div th:replace="include/userPage::html" ></div>
+    <div th:replace="include/fore/userPage::html" ></div>
 </div>
-<div th:replace="include/userFooter::html" ></div>
+<div th:replace="include/fore/userFooter::html" ></div>
 </body>
 </html>
