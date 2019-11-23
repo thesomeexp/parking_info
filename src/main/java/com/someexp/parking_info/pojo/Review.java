@@ -3,12 +3,13 @@ package com.someexp.parking_info.pojo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(name = "review")
 @JsonIgnoreProperties({ "handler","hibernateLazyInitializer" })
-public class Review {
+public class Review  implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -29,6 +30,22 @@ public class Review {
     @Transient
     private String username;
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setAccuracy(Integer accuracy) {
+        this.accuracy = accuracy;
+    }
+
+    public void setEasyToFind(Integer easyToFind) {
+        this.easyToFind = easyToFind;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -37,18 +54,6 @@ public class Review {
         this.username = username;
     }
 
-    @Override
-    public String toString() {
-        return "Review{" +
-                "id=" + id +
-                ", uid=" + uid +
-                ", pid=" + pid +
-                ", accuracy=" + accuracy +
-                ", easyToFind=" + easyToFind +
-                ", content='" + content + '\'' +
-                ", submitDate=" + submitDate +
-                '}';
-    }
 
     public Date getSubmitDate() {
         return submitDate;
@@ -56,14 +61,6 @@ public class Review {
 
     public void setSubmitDate(Date submitDate) {
         this.submitDate = submitDate;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public int getUid() {

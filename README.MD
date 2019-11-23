@@ -7,7 +7,7 @@ SpringBoot默认JDK1.8
 静态资源webapp下
 动态资源resources/templates
 配置resources/
-数据库表resources/parking.sql
+数据库表resources/parking.sql 数据库使用utf8mb4编码
 ### 2.目录说明
 源代码路径：/src
 

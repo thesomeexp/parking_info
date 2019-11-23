@@ -3,12 +3,13 @@ package com.someexp.parking_info.pojo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(name = "temp")
 @JsonIgnoreProperties({ "handler","hibernateLazyInitializer" })
-public class Temp {
+public class Temp  implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

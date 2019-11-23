@@ -19,15 +19,18 @@
                 login:function(){
                     var url =  this.uri;
                     var formData = new FormData();
+                    var timestamp = Date.parse(new Date());
                     formData.append("phone", this.user.phone);
                     formData.append("password", this.user.password);
-                    axios.post(url, formData).then(function(response) {
+                    axios.post(url, formData,
+                        {headers: {"timestamp": timestamp}}
+                        ).then(function(response) {
                         var result = response.data;
-                        var _csrf_token = result.data._csrf_token;
+                        var timestamp = Date.parse(new Date());
+                        var _csrf_token = response.headers._csrf_token;
                         if (result.status == "success") {
-                            alert(_csrf_token)
                             window.localStorage.setItem("_csrf_token", _csrf_token);
-                            location.href="home";
+                            location.href="homePage";
                         } else {
                             alert(result.message)
                         }

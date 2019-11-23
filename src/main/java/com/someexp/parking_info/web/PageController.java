@@ -8,82 +8,89 @@ public class PageController {
 
     @GetMapping(value="/")
     public String index(){
-        return "redirect:home";
+        return "redirect:homePage";
     }
 
     // 主页页面
     // get: listNearbyInfos
     // post: logout
-    @GetMapping(value="/home")
+    @GetMapping(value="/homePage")
     public String home(){
         return "home";
     }
 
     // 注册页面
     // post: register
-    @GetMapping(value="/register")
+    @GetMapping(value="/registerPage")
     public String register(){
         return "register";
     }
 
     // 登录页面
     // post: login
-    @GetMapping(value="/login")
+    @GetMapping(value="/loginPage")
     public String login(){
         return "login";
     }
 
     // 未授权页面
-    @GetMapping(value="/noAuth")
+    @GetMapping(value="/noAuthPage")
     public String noAuth(){
         return "error/noAuth";
     }
 
     // 提交车停车场信息页面
     // post: addInfo
-    @GetMapping(value="/add_info")
+    @GetMapping(value="/addInfoPage")
     public String addInfo(){
         return "fore/addInfo";
     }
 
     // 提交停车场详情图片页面
     // post: addInfoImage
-    @GetMapping(value="/add_info_image")
+    @GetMapping(value="/addInfoImagePage")
     public String addInfoImage(){
         return "fore/addInfoImage";
     }
 
     // 测试页面  查看停车场所有图片
     // get: listInfoImages
-    @GetMapping(value="/list_info_images")
+    @GetMapping(value="/listInfoImagesPage")
     public String listInfoImages(){
         return "fore/listInfoImages";
     }
 
     // 我提交的停车场信息页面
     // get: mySubmitInfos
-    @GetMapping(value="/my_submit_infos")
+    @GetMapping(value="/mySubmitInfosPage")
     public String mySubmitInfos(){
         return "fore/mySubmitInfos";
     }
-    @GetMapping(value="/add_review")
+    @GetMapping(value="/addReviewPage")
     public String addReview(){
         return "fore/addReview";
     }
-    @GetMapping(value="/info_detail")
+    @GetMapping(value="/infoDetailPage")
     public String infoDetail(){
         return "fore/infoDetail";
     }
-    @GetMapping(value="/add_temp")
+    @GetMapping(value="/addTempPage")
     public String addTemp(){
         return "fore/addTemp";
     }
 
 
-    @GetMapping(value="/admin")
+    @GetMapping(value="/adminPage")
     public String adminHome(){
         return "admin/home";
     }
-
+    @GetMapping(value = "/adminVerifiedInfoPage")
+    public String adminVerifiedInfoPage() {
+        return "admin/verifiedInfo";
+    }
+    @GetMapping(value = "/adminListDisableInfoPage")
+    public String adminListDisableInfoPage() {
+        return "admin/disableInfo";
+    }
 
 }

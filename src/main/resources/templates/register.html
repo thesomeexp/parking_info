@@ -23,10 +23,13 @@
                         return;
                     }
                     var formData = new FormData();
+                    var timestamp = Date.parse(new Date());
                     formData.append("name", this.user.name);
                     formData.append("password", this.user.password);
                     formData.append("phone", this.user.phone);
-                    axios.post(url, formData).then(function (response) {
+                    axios.post(url, formData,
+                    {headers: {"timestamp": timestamp}}
+                ).then(function (response) {
                         var result = response.data;
                         if (result.status == "success") {
                             alert("注册成功");

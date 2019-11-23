@@ -1,5 +1,6 @@
 package com.someexp.parking_info.config;
 
+import com.someexp.parking_info.filter.ShiroAuthFilter;
 import com.someexp.parking_info.pojo.User;
 import com.someexp.parking_info.realm.JPARealm;
 import com.someexp.parking_info.util.MagicVariable;
@@ -14,6 +15,7 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import javax.servlet.Filter;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -30,6 +32,9 @@ public class ShiroConfiguration {
     public ShiroFilterFactoryBean shirFilter(SecurityManager securityManager){
         ShiroFilterFactoryBean shiroFilterFactoryBean  = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager);
+        Map<String, Filter> filters = shiroFilterFactoryBean.getFilters();
+        // 重写验证的方法, 主要是一些资源的验证
+        filters.put("authc", new ShiroAuthFilter());
         /**
          * Shiro内置过滤器, 可以实现权限相关的拦截器
          * 常用的过滤器:
@@ -41,29 +46,31 @@ public class ShiroConfiguration {
          */
         Map<String, String> filterMap = new LinkedHashMap<>();
 
+        // ===============前后分离, 只做api接口的认证, 而不做页面的认证===========
         // 放行的页面
-        filterMap.put("/home", "anon");
-        filterMap.put("/login", "anon");
-        filterMap.put("/register", "anon");
-        filterMap.put("/listNearbyInfos", "anon");
-        // 放行的静态资源, 首张图片, css, js文件等
-        filterMap.put("/static/**", "anon");
-
-        // 验证才能访问的静态资源, 详情图片等
-        filterMap.put("/data/**", "authc");
-
+//        filterMap.put("/home", "anon");
+//        filterMap.put("/login", "anon");
+//        filterMap.put("/register", "anon");
+//        filterMap.put("/listNearbyInfos", "anon");
         // 管理员才能访问的东西, 拦截后自动跳转到未授权页面
-        filterMap.put("/admin/**", "perms[admin]");
+//        filterMap.put("/admin/**", "perms[admin]");
+
+        // 放行的静态资源, 首张图片, css, js文件等
+//        filterMap.put("/static/**", "anon");
+        // 验证登录才能访问的静态资源, 详情图片等
+        filterMap.put("/data/**", "authc");
+        // 验证登录才能访问的api接口
+        filterMap.put("/fore**", "authc");
         // 管理员才能访问的api接口
         filterMap.put("/admin**", "perms[admin]");
 
-        filterMap.put("/**", "authc");
+        filterMap.put("/**", "anon");
 
+        //前后端分离, 这个我就不写了
         // 修改调整的登录页面
-        shiroFilterFactoryBean.setLoginUrl("/login");
+//        shiroFilterFactoryBean.setLoginUrl("/login");
         // 设置未授权提示页面
-        shiroFilterFactoryBean.setUnauthorizedUrl("/noAuth");
-
+//        shiroFilterFactoryBean.setUnauthorizedUrl("/noAuth");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterMap);
 
         return shiroFilterFactoryBean;

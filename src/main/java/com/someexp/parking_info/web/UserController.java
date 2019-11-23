@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.HtmlUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +35,10 @@ public class UserController {
     InfoService infoService;
 
     /**
-     * 检查参数是否为空, 用户名手机号是否存在
+     * 检查timestamp
+     * 检查参数是否为空
+     * 检查用户名, 手机号, 密码长度是否合法
+     * 用户名手机号是否存在
      * 生成加密后的密码
      * 插入新用户
      * @param name
@@ -42,14 +47,25 @@ public class UserController {
      * @return
      */
     @PostMapping("/register")
-    public Object register(String name, String password, String phone) {
+    public Object register(String name, String password, String phone, HttpServletRequest request) {
         try {
+            long req_timestamp = Long.parseLong(request.getHeader("timestamp"));
+            long server_timestamp = System.currentTimeMillis();
+            if (server_timestamp - req_timestamp > MagicVariable.REPLAY_ATTACK_INTERVAL){
+                return Result.fail(MagicVariable.REPLAY_ATTACK_DETECT);
+            }
+
             if (MyTools.isStringEmpty(name))
                 return Result.fail(MagicVariable.USERNAME_IS_EMPTY);
             if (MyTools.isStringEmpty(password))
                 return Result.fail(MagicVariable.PASSWORD_IS_EMPTY);
             if (MyTools.isStringEmpty(phone))
                 return Result.fail(MagicVariable.PHONE_IS_EMPTY);
+
+            if (!MyTools.isValueLengthLegal(name, MagicVariable.USER_NAME_MAX_LEN) ||
+                    !MyTools.isValueLengthLegal(phone, MagicVariable.USER_PASSWORD_MAX_LEN) ||
+                    !MyTools.isValueLengthLegal(password, MagicVariable.USER_PASSWORD_MAX_LEN))
+                return Result.fail(MagicVariable.PARAM_VALUES_TOO_MAX);
 
             if (userService.isNameExist(name))
                 return Result.fail(MagicVariable.USERNAME_IS_EXIST);
@@ -75,15 +91,17 @@ public class UserController {
     }
 
     /**
-     *检查手机号, 密码
-     *登录后设置user到sesseion里
+     * 检查timestamp
+     * 检查手机号, 密码是否为空
+     * 登录后设置user, _csrf_token到sesseion里
+     * 返回_csrf_token
      * @param phone
      * @param password
      * @param session
      * @return
      */
     @PostMapping("/login")
-    public Object login(String phone, String password, HttpSession session) {
+    public Object login(String phone, String password, HttpSession session, HttpServletRequest request, HttpServletResponse response) {
         try {
             if (MyTools.isStringEmpty(phone))
                 return Result.fail(MagicVariable.PHONE_IS_EMPTY);
@@ -102,10 +120,9 @@ public class UserController {
             String csrfToken = CSRFTokenUtil.generate();
             session.setAttribute("user", user);
             session.setAttribute("_csrf_token", csrfToken);
-
-            Map<String, String> map = new HashMap<>();
-            map.put("_csrf_token", csrfToken);
-            return Result.success(map);
+            response.addHeader("_csrf_token", csrfToken);
+//            map.put("_csrf_token", csrfToken);
+            return Result.success();
         } catch (UnknownAccountException e){
             // 登录失败用户名不存在
             return Result.fail(MagicVariable.USER_PHONE_NOT_EXIST);
@@ -120,23 +137,19 @@ public class UserController {
     }
 
     /**
-     * 注销, 销毁session里的user
-     * @param session
+     * 注销, 销毁session
      * @return
      */
     @PostMapping("/logout")
-    public Object logout(HttpSession session) {
+    public Object logout() {
         try {
             Subject subject = SecurityUtils.getSubject();
-            // shiro的一个bug?在logout前执行就会报错
-//            session.invalidate();
             if (subject.isAuthenticated()) {
                 subject.logout();
                 return Result.success(MagicVariable.LOGOUT_SUCCESS);
             } else {
                 return Result.fail(MagicVariable.UN_LOGIN);
             }
-
         } catch (Exception e){
             e.printStackTrace();
             return Result.fail(MagicVariable.LOGGER_ERROR_NO_LOGIN);

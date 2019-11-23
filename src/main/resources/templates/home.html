@@ -18,22 +18,25 @@
             data: data4Vue,
             methods: {
                 list:function(){
-                    if(!checkEmpty(this.location, "location"))
-                        return;
-                    var url =  this.uri+"?location="+this.location;
-                    axios.get(url).then(function(response) {
+                    var url =  this.uri;
+                    var timestamp = Date.parse(new Date());
+                    axios.get(url, {
+                        params: {location: this.location},
+                        headers: {timestamp: timestamp}
+                    }).then(function(response) {
                         vue.beans = response.data.data.infos;
                     });
                 },
                 logout:function(){
                     var url =  'logout';
+                    var timestamp = Date.parse(new Date());
                     axios.post(url,
                         this.user,
-                        {headers: {"_csrf_token": window.localStorage.getItem("_csrf_token")}}
+                        {headers: {"_csrf_token": window.localStorage.getItem("_csrf_token"), "timestamp": timestamp}}
                     ).then(function(response) {
                         var result = response.data;
                         if (result.status == "success") {
-                            location.href="home";
+                            location.href="homePage";
                         } else {
                             alert(result.message)
                         }
@@ -53,9 +56,8 @@
 
 </script>
 <div id="workingArea" >
-    <span th:if="${null!=session.user}">
         <a href="#nowhere" @click="logout">退出</a>
-    </span>
+        <a href="adminPage" >管理员页面</a>
     <br>
     <br>
 
@@ -96,7 +98,7 @@
                     {{bean.name}}
                 </td>
                 <td>
-                    {{bean.location}}
+                    {{bean.longitude + "," + bean.latitude}}
                 </td>
                 <td>
                     {{bean.infoSubmitDate  | formatDateFilter}}

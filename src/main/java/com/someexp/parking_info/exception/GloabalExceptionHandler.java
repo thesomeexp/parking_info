@@ -9,6 +9,7 @@ import com.someexp.parking_info.util.Result;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -75,5 +76,9 @@ public class GloabalExceptionHandler {
                 MagicVariable.LOGGER_ERROR_MESSAGE);
     }
 
+    @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
+    public Object HttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+        return Result.fail(MagicVariable.REQUEST_METHOD_NOT_SUPPORTED);
+    }
 
 }

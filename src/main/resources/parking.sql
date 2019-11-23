@@ -1,5 +1,8 @@
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
 DROP DATABASE IF EXISTS parking;
-CREATE DATABASE parking DEFAULT CHARACTER SET utf8;
+CREATE DATABASE parking DEFAULT CHARACTER SET utf8mb4;
 use parking;
 
 CREATE TABLE user (
@@ -10,7 +13,7 @@ CREATE TABLE user (
   phone varchar(64) NOT NULL UNIQUE,
   role varchar(64) NOT NULL,
   PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE info (
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -18,7 +21,7 @@ CREATE TABLE info (
   content varchar(4000) DEFAULT NULL,
   longitude double NOT NULL,
   latitude double NOT NULL,
-  geohash varchar(64) NOT NULL,
+  geoHash varchar(64) NOT NULL,
   uid int(11) NOT NULL,
   state varchar(64) NOT NULL,
   infoSubmitDate DATETIME NOT NULL,
@@ -47,10 +50,8 @@ CREATE TABLE info (
   t21 int NOT NULL,
   t22 int NOT NULL,
   t23 int NOT NULL,
-  CONSTRAINT fk_info_user FOREIGN KEY (uid) REFERENCES user (id),
   PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE review (
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -60,12 +61,8 @@ CREATE TABLE review (
   accuracy int(11) NOT NULL,
   easyToFind int(11) NOT NULL,
   content varchar(4000) NOT NULL,
-  CONSTRAINT fk_review_user FOREIGN KEY (uid) REFERENCES user (id),
-  CONSTRAINT fk_review_info FOREIGN KEY (pid) REFERENCES info (id),
   PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE INDEX isExistPidAndUidIndex ON review (pid, uid);
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE temp (
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -73,22 +70,17 @@ CREATE TABLE temp (
   pid int(11) NOT NULL,
   submitDate  timestamp NOT NULL,
   state int NOT NULL,
-  CONSTRAINT fk_temp_user FOREIGN KEY (uid) REFERENCES user (id),
-  CONSTRAINT fk_temp_info FOREIGN KEY (pid) REFERENCES info (id),
   PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE INDEX tempTimeIndex ON temp (submitDate);
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE infoImage (
   id int(11) NOT NULL AUTO_INCREMENT,
   pid int(11) NOT NULL,
   uid int(11) NOT NULL,
+  url varchar(64) NOT NULL,
   submitDate  timestamp NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT fk_image_info FOREIGN KEY (pid) REFERENCES info (id),
-  CONSTRAINT fk_image_user FOREIGN KEY (uid) REFERENCES user (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  PRIMARY KEY (id)
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 
 

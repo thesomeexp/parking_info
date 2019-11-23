@@ -7,7 +7,7 @@
 <script>
     $(function(){
         var data4Vue = {
-            uri:'adminListAllInfos',
+            uri:'adminListDisableInfo',
             location:'',
             pagination:{},
             beans: []
@@ -19,12 +19,11 @@
             data: data4Vue,
             methods: {
                 list:function(start){
-                    var url =  this.uri + "?start=" + start
+                    var url =  this.uri + "?start=" + start;
                     var formData = new FormData();
-                    var timestamp = Date.parse(new Date());
-                    axios.get(url, {
-                        headers: {_csrf_token: window.localStorage.getItem("_csrf_token"), timestamp: timestamp}
-                    }).then(function(response) {
+                    axios.get(url,
+                        {headers: {_csrf_token: window.localStorage.getItem("_csrf_token"), timestamp: Date.parse(new Date())}}
+                    ).then(function(response) {
                         vue.beans = response.data.data.content;
                         vue.pagination = response.data.data;
                         var _csrf_token = response.headers._csrf_token;
@@ -43,21 +42,32 @@
                     })
                 },
                 delInfo:function (id) {
-                    var url =  'adminDisableInfo';
+                    var url =  'adminDeleteInfos';
                     var formData = new FormData();
-                    formData.append("pid", id);
-                    var timestamp = Date.parse(new Date());
-                    var _csrf_token = window.localStorage.getItem("_csrf_token");
-                    axios.post(url, formData,
-                        {headers: {"timestamp": timestamp, "_csrf_token": _csrf_token}}
-                    ).then(function(response) {
+                    formData.append("id", id);
+                    axios.post(url, formData).then(function(response) {
                         var result = response.data;
                         if (result.status == "success") {
                             alert('del success')
                         } else {
                             alert(result.message)
                         }
+                    })
+                },
+                enableInfo:function (id) {
+                    var url =  'adminEnableInfo';
+                    var formData = new FormData();
+                    var timestamp = Date.parse(new Date());
+                    formData.append("pid", id);
+                    axios.post(url, formData,
+                        {headers: {"_csrf_token": window.localStorage.getItem("_csrf_token"), "timestamp": timestamp}}).then(function(response) {
+                        var result = response.data;
                         var _csrf_token = response.headers._csrf_token;
+                        if (result.status == "success") {
+                            alert('verified success')
+                        } else {
+                            alert(result.message)
+                        }
                         window.localStorage.setItem("_csrf_token", _csrf_token);
                     })
                 },
@@ -81,7 +91,7 @@
 
 </script>
 <div id="workingArea" >
-        <a href="#nowhere" @click="logout">退出</a>
+    <a href="#nowhere" @click="logout">退出</a>
     <div th:replace="include/admin/adminTop2::html" ></div>
     <br>
     <br>
@@ -90,7 +100,7 @@
         <table class="addTable">
             <tr class="submitTR">
                 <td colspan="2" align="center">
-                    <a href="#nowhere"  @click="list(0)" class="btn btn-success">查看所有的停车场</a>
+                    <a href="#nowhere"  @click="list(0)" class="btn btn-success">查看所有禁用的停车场</a>
                 </td>
             </tr>
         </table>
@@ -106,8 +116,7 @@
                 <th>坐标</th>
                 <th>提交时间</th>
                 <th>状态</th>
-                <th>跳转到详情</th>
-                <th>删除</th>
+                <th>操作</th>
             </tr>
             </thead>
             <tbody>
@@ -127,10 +136,7 @@
                 </td>
                 <td>{{bean.state}}</td>
                 <td>
-                    <a :href="'/parking_info/info_detail?pid=' + bean.id" >详情</span></a>
-                </td>
-                <td>
-                    <a href="#" @click="delInfo(bean.id)" >禁用</a>
+                    <a href="#" @click="enableInfo(bean.id)" >还原</span></a>
                 </td>
             </tr>
             </tbody>

@@ -32,6 +32,7 @@ public class InfoService {
 //    @Caching(evict = {@CacheEvict(key="'infos-geohash-'+#p0"), @CacheEvict(key="'infos-one-'+#p1")})
 
 
+
     public boolean isLocationExist(double longitude, double latitude) throws Exception{
         Info result = infoDAO.getByLongitudeAndLatitude(longitude, latitude);
         if (result != null)
@@ -76,6 +77,26 @@ public class InfoService {
         return new Page4Navigator<>(pageFromJPA, navigatePages);
     }
 
+    // 管理员查询所有没有认证的停车场
+    public Page4Navigator<Info> listInfoNoVerified(int start, int size, int navigatePages)throws Exception{
+        Sort sort = new Sort(Sort.Direction.DESC, "id");
+        Pageable pageable = new PageRequest(start, size, sort);
+        Page pageFromJPA = infoDAO.findByState(MagicVariable.NO_VERIFIED, pageable);
+        List<Info> listInfo = pageFromJPA.getContent();
+        addUsername(listInfo);// 得到车位提交用户名
+        return new Page4Navigator<>(pageFromJPA, navigatePages);
+    }
+
+    // 管理员查询所有禁用的停车场
+    public Page4Navigator<Info> listInfoDisadble(int start, int size, int navigatePages)throws Exception{
+        Sort sort = new Sort(Sort.Direction.DESC, "id");
+        Pageable pageable = new PageRequest(start, size, sort);
+        Page pageFromJPA = infoDAO.findByState(MagicVariable.INFO_DISABLE, pageable);
+        List<Info> listInfo = pageFromJPA.getContent();
+        addUsername(listInfo);// 得到车位提交用户名
+        return new Page4Navigator<>(pageFromJPA, navigatePages);
+    }
+
     // 查询自己提交的停车位(不好加缓存)
     public Page listInfoByUidOrderBySubmitDateDesc(int Uid, Pageable pageable)
             throws Exception{
@@ -103,7 +124,13 @@ public class InfoService {
 
 //    @Cacheable(key="'infos-geohash-'+#p0")
     public List<Info> searchInfoByGeoHash(String geoHash) {
-        List<Info> infos = infoDAO.findByGeohashLike(geoHash + "%");
+        List<Info> infos = infoDAO.findByGeoHashLike(geoHash + "%");
+        addUsername(infos);
+        return infos;
+    }
+
+    public List<Info> searchInfoByGeoHashAndVerified(String geoHash){
+        List<Info> infos = infoDAO.findByGeoHashLikeAndState(geoHash + "%", MagicVariable.VERIFIED);
         addUsername(infos);
         return infos;
     }

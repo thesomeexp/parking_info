@@ -23,7 +23,7 @@ public class Info implements Serializable {
 
     private Double latitude;
 
-    private String geohash;
+    private String geoHash;
 
     private int uid;
 
@@ -69,7 +69,7 @@ public class Info implements Serializable {
                 ", content='" + content + '\'' +
                 ", longitude=" + longitude +
                 ", latitude=" + latitude +
-                ", geohash='" + geohash + '\'' +
+                ", geoHash='" + geoHash + '\'' +
                 ", uid=" + uid +
                 ", infoSubmitDate=" + infoSubmitDate +
                 ", stateUpdateDate=" + stateUpdateDate +
@@ -118,20 +118,20 @@ public class Info implements Serializable {
         this.latitude = latitude;
     }
 
-    public String getGeohash() {
-        return geohash;
-    }
-
-    public void setGeohash(String geohash) {
-        this.geohash = geohash;
-    }
-
     public String getContent() {
         return content;
     }
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getGeoHash() {
+        return geoHash;
+    }
+
+    public void setGeoHash(String geoHash) {
+        this.geoHash = geoHash;
     }
 
     public Date getInfoSubmitDate() {

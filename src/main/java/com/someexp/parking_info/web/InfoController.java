@@ -39,10 +39,59 @@ public class InfoController {
     ReviewService reviewService;
 
     /**
+     * 检查timestamp
+     * 根据提交的location查询对应geohash和邻接geohash的停车场
+     * 检查位置是否为空, 合法
+     * 查询location的geohash块中的停车场, 再查询邻接的块放进infos
+     * 查询成功返回对应map
+     * @param location
+     * @return
+     */
+    @GetMapping("/listNearbyInfos")
+    public Object listNearbyInfos(@RequestParam(value = "location") String location, HttpServletRequest request) {
+        try {
+            long req_timestamp = Long.parseLong(request.getHeader("timestamp"));
+            long server_timestamp = System.currentTimeMillis();
+            if (server_timestamp - req_timestamp > MagicVariable.REPLAY_ATTACK_INTERVAL){
+                return Result.fail(MagicVariable.REPLAY_ATTACK_DETECT);
+            }
+
+            if (MyTools.isStringEmpty(location))
+                return Result.fail(MagicVariable.BAD_REQUEST);
+
+            double[] xyArray = MyTools.praseLocation(location);
+            double x = xyArray[0];
+            double y = xyArray[1];
+            if (!MyTools.isXYLegal(x, y))
+                return Result.fail(MagicVariable.LOCATION_ILLEGAL);
+
+            GeoHash geoHash = GeoHash.withBitPrecision(y, x, MagicVariable.SEARCH_GEOHASH_LIMIT*5);
+            GeoHash[] arryGeoHash = geoHash.getAdjacent();
+            List<Info> infos = infoService.searchInfoByGeoHashAndVerified(GeoHash.geoHashStringWithCharacterPrecision(y, x,
+                    MagicVariable.SEARCH_GEOHASH_LIMIT));
+            for(int i=0; i<8 ;i++){
+                infos.addAll(infoService.searchInfoByGeoHashAndVerified(arryGeoHash[i].toBase32()));
+            }
+            Map<String, String> req_map = new HashMap<>();
+            req_map.put("location", location);
+            req_map.put("req_timestamp", Long.toString(req_timestamp));
+            Map<String, Object> map = new HashMap<>();
+            map.put("infos", infos);
+            map.put("timestamp", Long.toString(server_timestamp));
+            return Result.success(map, req_map);
+        } catch (Exception e) {
+            return Result.fail(MagicVariable.LOGGER_ERROR_NO_LOGIN);
+        }
+    }
+
+
+    /**
+     * 检查timestamp
      * 从请求获取session然后得到当前用户
      * 检查名字, 位置, 图片是否为空
+     * 检查名字, 内容是否超出
      * 判断位置是否合法, 是否存在
-     * 添加记录
+     * 不存在则添加记录
      * 添加首张图片
      * 清除同区域Redis缓存
      * @param name
@@ -53,7 +102,7 @@ public class InfoController {
      * @return
      * @throws Exception
      */
-    @PostMapping("/addInfo")
+    @PostMapping("/foreAddInfo")
     public Object addInfo(String name, String location, MultipartFile image,
                           String content, HttpServletRequest request) throws Exception {
         User user = (User) request.getSession().getAttribute("user");
@@ -65,6 +114,10 @@ public class InfoController {
             return Result.fail(MagicVariable.INFO_NAME_IS_EMPTY);
         if (MyTools.isStringEmpty(location))
             return Result.fail(MagicVariable.INFO_LOCATION_EMPTY);
+
+        if (!MyTools.isValueLengthLegal(name, MagicVariable.INFO_NAME_MAX_LEN) ||
+                !MyTools.isValueLengthLegal(content, MagicVariable.INFO_CONTENT_MAX_LEN))
+            return Result.fail(MagicVariable.PARAM_VALUES_TOO_MAX);
 
         double[] xyArray = MyTools.praseLocation(location);
         double x = xyArray[0];
@@ -79,7 +132,7 @@ public class InfoController {
         newInfo.setContent(content);
         newInfo.setLongitude(x);
         newInfo.setLatitude(y);
-        newInfo.setGeohash(GeoHash.geoHashStringWithCharacterPrecision(y, x, MagicVariable.INFO_GEOHASH_LIMIT));
+        newInfo.setGeoHash(GeoHash.geoHashStringWithCharacterPrecision(y, x, MagicVariable.INFO_GEOHASH_LIMIT));
         newInfo.setUid(user.getId());
         Date curr = new Date();
         newInfo.setInfoSubmitDate(curr);
@@ -89,7 +142,7 @@ public class InfoController {
         infoService.add(newInfo);
         saveOrUpdateImageFile(newInfo, image, request);// 添加首张图片
         infoService.delGeoHashCache(GeoHash.geoHashStringWithCharacterPrecision(newInfo.getLatitude(), newInfo.getLongitude(),
-                MagicVariable.SEARCH_GEOHASH_LIMIT));// 清除同区域geohash缓存
+                MagicVariable.SEARCH_GEOHASH_LIMIT));// 注解清除同区域geohash缓存
         return Result.success(MagicVariable.INFO_ADD_SUCCESS);
     }
     // 添加图片bug: 如果不是png, jpg文件就会抛出异常, 后期可以做一下图片压缩
@@ -113,20 +166,102 @@ public class InfoController {
      */
     @GetMapping("/adminListAllInfos")
     public Object list(@RequestParam(value = "start", defaultValue = "0") String start,
-                       @RequestParam(value = "size", defaultValue = "5") String size) throws Exception {
-        if (MyTools.isStringEmpty(start, size))
-            return Result.fail(MagicVariable.BAD_REQUEST);
-
+                       @RequestParam(value = "size", defaultValue = "5") String size,
+                        @RequestParam(value = "navigatePage", defaultValue = "5") String navigatePage) throws Exception {
         Map<String, String> req_map = new HashMap<>();
         req_map.put("start", start);
         req_map.put("size", size);
+        req_map.put("navigatePage", navigatePage);
         int int_start = Integer.parseInt(start);
         int_start = int_start<0?0:int_start;
         int int_size = Integer.parseInt(size);
-        Page4Navigator<Info> page = infoService.list(int_start, int_size, 5);  //5表示导航分页最多有5个，像 [1,2,3,4,5] 这样
+        int_size = int_size<1?1:int_size;
+        int int_navigatePage = Integer.parseInt(navigatePage);
+        int_navigatePage = int_navigatePage<1?1:int_navigatePage;
+        Page4Navigator<Info> page = infoService.list(int_start, int_size, int_navigatePage);  //5表示导航分页最多有5个，像 [1,2,3,4,5] 这样
         return Result.success(page, req_map);
     }
 
+    @GetMapping("/adminListNoVerifiedInfo")
+    public Object adminListNoVerifiedInfo(@RequestParam(value = "start", defaultValue = "0") String start,
+                                     @RequestParam(value = "size", defaultValue = "5") String size,
+                                     @RequestParam(value = "navigatePage", defaultValue = "5") String navigatePage) throws Exception{
+        Map<String, String> req_map = new HashMap<>();
+        req_map.put("start", start);
+        req_map.put("size", size);
+        req_map.put("navigatePage", navigatePage);
+        int int_start = Integer.parseInt(start);
+        int_start = int_start<0?0:int_start;
+        int int_size = Integer.parseInt(size);
+        int_size = int_size<1?1:int_size;
+        int int_navigatePage = Integer.parseInt(navigatePage);
+        int_navigatePage = int_navigatePage<1?1:int_navigatePage;
+        Page4Navigator<Info> page = infoService.listInfoNoVerified(int_start, int_size, int_navigatePage);
+        return Result.success(page, req_map);
+    }
+
+    @GetMapping("/adminListDisableInfo")
+    public Object adminListDisableInfo(@RequestParam(value = "start", defaultValue = "0") String start,
+                                       @RequestParam(value = "size", defaultValue = "5") String size,
+                                       @RequestParam(value = "navigatePage", defaultValue = "5") String navigatePage) throws Exception{
+        Map<String, String> req_map = new HashMap<>();
+        req_map.put("start", start);
+        req_map.put("size", size);
+        req_map.put("navigatePage", navigatePage);
+        int int_start = Integer.parseInt(start);
+        int_start = int_start<0?0:int_start;
+        int int_size = Integer.parseInt(size);
+        int_size = int_size<1?1:int_size;
+        int int_navigatePage = Integer.parseInt(navigatePage);
+        int_navigatePage = int_navigatePage<1?1:int_navigatePage;
+        Page4Navigator<Info> page = infoService.listInfoDisadble(int_start, int_size, int_navigatePage);
+        return Result.success(page, req_map);
+    }
+
+    @PostMapping("/adminVerifiedInfo")
+    public Object adminVerifiedInfo(String pid, HttpServletRequest request){
+        if (pid == null)
+            return Result.fail(MagicVariable.PARAM_VALUES_IS_EMPTY);
+        int int_pid = Integer.parseInt(pid);
+        Info info = infoService.getById(int_pid);
+        if (info == null)
+            return Result.fail(MagicVariable.INFO_NOT_EXIST);
+        info.setState(MagicVariable.VERIFIED);
+        infoService.update(info);
+        infoService.delGeoHashCache(GeoHash.geoHashStringWithCharacterPrecision(info.getLatitude(), info.getLongitude(),
+                        MagicVariable.SEARCH_GEOHASH_LIMIT));// 注解清除同区域geohash缓存
+        return Result.success();
+    }
+
+    @PostMapping("/adminDisableInfo")
+    public Object adminDisableInfo(String pid, HttpServletRequest request){
+        if (pid == null)
+            return Result.fail(MagicVariable.PARAM_VALUES_IS_EMPTY);
+        int int_pid = Integer.parseInt(pid);
+        Info info = infoService.getById(int_pid);
+        if (info == null)
+            return Result.fail(MagicVariable.INFO_NOT_EXIST);
+        info.setState(MagicVariable.INFO_DISABLE);
+        infoService.update(info);
+        infoService.delGeoHashCache(GeoHash.geoHashStringWithCharacterPrecision(info.getLatitude(), info.getLongitude(),
+                MagicVariable.SEARCH_GEOHASH_LIMIT));// 注解清除同区域geohash缓存
+        return Result.success();
+    }
+
+    @PostMapping("/adminEnableInfo")
+    public Object adminEnableInfo(String pid, HttpServletRequest request){
+        if (pid == null)
+            return Result.fail(MagicVariable.PARAM_VALUES_IS_EMPTY);
+        int int_pid = Integer.parseInt(pid);
+        Info info = infoService.getById(int_pid);
+        if (info == null)
+            return Result.fail(MagicVariable.INFO_NOT_EXIST);
+        info.setState(MagicVariable.VERIFIED);
+        infoService.update(info);
+        infoService.delGeoHashCache(GeoHash.geoHashStringWithCharacterPrecision(info.getLatitude(), info.getLongitude(),
+                MagicVariable.SEARCH_GEOHASH_LIMIT));// 注解清除同区域geohash缓存
+        return Result.success();
+    }
     /**
      * 先拿id查询出整个记录, 查询出所有
      * 删除记录再删除两个缓存geohash, one
@@ -152,42 +287,6 @@ public class InfoController {
         return Result.success(MagicVariable.INFO_DELETE_SUCCESS);
     }
 
-    /**
-     * 根据提交的location查询对应geohash和邻接geohash的停车场
-     * 检查位置是否为空, 合法
-     * 查询location的geohash块中的停车场, 再查询邻接的块放进infos
-     * 查询成功返回对应map
-     * @param location
-     * @return
-     */
-    @GetMapping("/listNearbyInfos")
-    public Object listNearbyInfos(@RequestParam(value = "location") String location) {
-        try {
-            if (MyTools.isStringEmpty(location))
-                return Result.fail(MagicVariable.BAD_REQUEST);
-
-            double[] xyArray = MyTools.praseLocation(location);
-            double x = xyArray[0];
-            double y = xyArray[1];
-            if (!MyTools.isXYLegal(x, y))
-                return Result.fail(MagicVariable.LOCATION_ILLEGAL);
-
-            GeoHash geoHash = GeoHash.withBitPrecision(y, x, MagicVariable.SEARCH_GEOHASH_LIMIT*5);
-            GeoHash[] arryGeoHash = geoHash.getAdjacent();
-            List<Info> infos = infoService.searchInfoByGeoHash(GeoHash.geoHashStringWithCharacterPrecision(y, x,
-                    MagicVariable.SEARCH_GEOHASH_LIMIT));
-            for(int i=0; i<8 ;i++){
-                infos.addAll(infoService.searchInfoByGeoHash(arryGeoHash[i].toBase32()));
-            }
-            Map<String, String> req_map = new HashMap<>();
-            req_map.put("location", location);
-            Map<String, List<Info>> map = new HashMap<>();
-            map.put("infos", infos);
-            return Result.success(map, req_map);
-        } catch (Exception e) {
-            return Result.fail(MagicVariable.LOGGER_ERROR_NO_LOGIN);
-        }
-    }
 
     /**
      * 根据传来的pid返回该停车场详情

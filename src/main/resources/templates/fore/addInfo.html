@@ -6,7 +6,7 @@
 <script>
     $(function(){
         var data4Vue = {
-            uri:'addInfo',
+            uri:'foreAddInfo',
             info:{name:'', location:'', content:''},
             file:null
         };
@@ -23,14 +23,20 @@
                     var url = this.uri;
                     //axios.js 上传文件要用 formData 这种方式
                     var formData = new FormData();
+                    var timestamp = Date.parse(new Date());
+                    var _csrf_token = window.localStorage.getItem("_csrf_token");
                     formData.append("name", this.info.name);
                     formData.append("content", this.info.content);
                     formData.append("location", this.info.location);
                     formData.append("image", this.file);
-                    axios.post(url,formData).then(function(response){
+                    axios.post(url,formData,
+                        {headers: {"timestamp": timestamp, "_csrf_token": _csrf_token}}
+                    ).then(function(response){
                         vue.info = {name:'', location:'', content:''};
                         $("#infoPic").val('');
                         vue.file = null;
+                        var _csrf_token = response.headers._csrf_token;
+                        window.localStorage.setItem("_csrf_token", _csrf_token);
                     });
                 },
                 getFile: function (event) { //选中本地文件就会保存到data4Vue.file

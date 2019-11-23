@@ -25,6 +25,12 @@ public class MyTools {
             return false;
     }
 
+    public static final boolean isValueLengthLegal(String val, int len){
+        if (val.length() > len)
+            return false;
+        return true;
+    }
+
     public static final boolean isXYLegal(double x, double y) throws Exception{
         if (x < MagicVariable.MINIMUM_X ||
                 x > MagicVariable.MAXIMUM_X ||

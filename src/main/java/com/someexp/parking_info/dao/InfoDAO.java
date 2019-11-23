@@ -15,6 +15,11 @@ public interface InfoDAO extends JpaRepository<Info,Integer> {
                                                 double yMax);
     public Page findByUidOrderByInfoSubmitDateDesc(int Uid, Pageable pageable);
 
-    public List<Info> findByGeohashLike(String s);
+    public List<Info> findByGeoHashLike(String s);
     public Info getByLongitudeAndLatitude(double longitude, double latitude);
+
+    public List<Info> findByGeoHashLikeAndState(String geoHash, String state);
+
+    public Page findByState(String noVerified, Pageable pageable);
+
 }

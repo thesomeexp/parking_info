@@ -79,4 +79,19 @@ public class MagicVariable {
     public static final int SEARCH_GEOHASH_LIMIT = 6;
     public static final int INFO_GEOHASH_LIMIT = 7;
 
+    public static final long REPLAY_ATTACK_INTERVAL = 60000;
+    public static final String REPLAY_ATTACK_DETECT = "检测到重放攻击";
+    public static final String REQUEST_METHOD_NOT_SUPPORTED = "http请求方法不支持";
+
+    // 参数长度类
+    public static final int INFO_NAME_MAX_LEN = 64;
+    public static final int INFO_CONTENT_MAX_LEN = 4000;
+    public static final int USER_NAME_MAX_LEN = 64;
+    public static final int USER_PASSWORD_MAX_LEN = 64;
+    public static final int USER_PHONE_MAX_LEN = 11;
+    public static final int REVIEW_CONTENT_MAX_LEN = 4000;
+
+    public static final String PARAM_VALUES_TOO_MAX = "请求参数长度过长";
+    public static final String VERIFIED = "verified";
+    public static final String INFO_DISABLE = "disable";
 }
