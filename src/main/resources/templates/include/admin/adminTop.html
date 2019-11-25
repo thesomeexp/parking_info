@@ -3,21 +3,19 @@
     <span>欢迎</span>
 
     <span th:if="${null==session.user}">
-        <a href="login">请登录</a>
-        <a href="register">免费注册</a>
+        <a href="loginPage">请登录</a>
+        <a href="registerPage">免费注册</a>
     </span>
 
     <span>
-        <a href="add_info">添加停车位</a>
-        <a href="add_review">添加评论</a>
-        <a href="add_info_image">添加图片信息</a>
-        <a href="add_temp">添加状态</a>
-        <a href="my_submit_infos">我提交的停车位</a>
+        <a href="addInfoPage">添加停车位</a>
+        <a href="addReviewPage">添加评论</a>
+        <a href="addInfoImagePage">添加图片信息</a>
+        <a href="addTempPage">添加状态</a>
+        <a href="mySubmitInfosPage">我提交的停车位</a>
     </span>
 
     <span class="pull-right">
             <a href="">我的信息</a>
     </span>
-
-
 </nav>

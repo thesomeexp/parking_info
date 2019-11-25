@@ -7,10 +7,11 @@
 <script>
     $(function(){
         var data4Vue = {
-            uri:'adminListAllInfos',
+            uri:'adminListDisableInfoImages',
             location:'',
             pagination:{},
-            beans: []
+            beans: [],
+            infoImages:[]
         };
 
         //ViewModel
@@ -25,8 +26,9 @@
                     axios.get(url, {
                         headers: {_csrf_token: window.localStorage.getItem("_csrf_token"), timestamp: timestamp}
                     }).then(function(response) {
-                        vue.beans = response.data.data.content;
-                        vue.pagination = response.data.data;
+                        var result = response.data;
+                        vue.infoImages = result.data.content;
+                        vue.pagination = result.data;
                         window.localStorage.setItem("_csrf_token", response.headers._csrf_token);
                     });
                 },
@@ -42,7 +44,7 @@
                     })
                 },
                 delInfo:function (id) {
-                    var url =  'adminDisableInfo';
+                    var url =  'adminEnableInfoImage';
                     var formData = new FormData();
                     formData.append("pid", id);
                     var timestamp = Date.parse(new Date());
@@ -52,7 +54,7 @@
                     ).then(function(response) {
                         var result = response.data;
                         if (result.status == "success") {
-                            alert('del success')
+                            alert('disable success')
                         } else {
                             alert(result.message)
                         }
@@ -80,7 +82,7 @@
 
 </script>
 <div id="workingArea" >
-        <a href="#nowhere" @click="logout">退出</a>
+    <a href="#nowhere" @click="logout">退出</a>
     <div th:replace="include/admin/adminTop2::html" ></div>
     <br>
     <br>
@@ -89,7 +91,7 @@
         <table class="addTable">
             <tr class="submitTR">
                 <td colspan="2" align="center">
-                    <a href="#nowhere"  @click="list(0)" class="btn btn-success">查看所有的停车场</a>
+                    <a href="#nowhere"  @click="list(0)" class="btn btn-success">列出所有详情图片</a>
                 </td>
             </tr>
         </table>
@@ -100,36 +102,42 @@
             <thead>
             <tr class="success">
                 <th>ID</th>
+                <th>停车场名称</th>
                 <th>图片</th>
-                <th>车位名称</th>
-                <th>坐标</th>
-                <th>提交时间</th>
+                <th>pid</th>
                 <th>状态</th>
-                <th>跳转到详情</th>
-                <th>删除</th>
+                <th>提交时间</th>
+                <th>uid</th>
+                <th>url</th>
+                <th>提交用户名</th>
+                <th>操作</th>
             </tr>
             </thead>
             <tbody>
-            <tr v-for="bean in beans ">
-                <td>{{bean.id}}</td>
+            <tr v-for="infoImage in infoImages ">
+                <td>{{infoImage.id}}</td>
+                <td>{{infoImage.infoname}}</td>
                 <td>
-                    <img height="40px"  :src="'static/img/info/'+bean.id+'.jpg'">
+                    <img height="40px" :src="infoImage.url">
                 </td>
                 <td>
-                    {{bean.name}}
+                    {{infoImage.pid}}
                 </td>
                 <td>
-                    {{bean.longitude + "," + bean.latitude}}
+                    {{infoImage.state}}
                 </td>
                 <td>
-                    {{bean.infoSubmitDate  | formatDateFilter}}
-                </td>
-                <td>{{bean.state}}</td>
-                <td>
-                    <a :href="'/infoDetailPage?pid=' + bean.id" >详情</span></a>
+                    {{infoImage.submitDate  | formatDateFilter}}
                 </td>
                 <td>
-                    <a href="#" @click="delInfo(bean.id)" >禁用</a>
+                    {{infoImage.uid}}
+                </td>
+                <td>{{infoImage.url}}</td>
+                <td>
+                    {{infoImage.username}}
+                </td>
+                <td>
+                    <a href="#" @click="delInfo(infoImage.id)" >启用</a>
                 </td>
             </tr>
             </tbody>

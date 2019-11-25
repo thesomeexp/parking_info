@@ -93,5 +93,6 @@ public class MagicVariable {
 
     public static final String PARAM_VALUES_TOO_MAX = "请求参数长度过长";
     public static final String VERIFIED = "verified";
-    public static final String INFO_DISABLE = "disable";
+    public static final String DISABLE = "disable";
+    public static final String INFO_IMAGE_NO_EXIST = "停车场照片不存在";
 }

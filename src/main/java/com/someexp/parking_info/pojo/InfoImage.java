@@ -21,14 +21,16 @@ public class InfoImage  implements Serializable {
 
     private int uid;
 
-    private String url;
-
     private Date submitDate;
+
+    private String state;
 
     @Transient
     private String username;
     @Transient
     private String infoname;
+    @Transient
+    private String url;
 
     @Override
     public String toString() {
@@ -36,11 +38,20 @@ public class InfoImage  implements Serializable {
                 "id=" + id +
                 ", pid=" + pid +
                 ", uid=" + uid +
-                ", url='" + url + '\'' +
                 ", submitDate=" + submitDate +
+                ", state='" + state + '\'' +
                 ", username='" + username + '\'' +
                 ", infoname='" + infoname + '\'' +
+                ", url='" + url + '\'' +
                 '}';
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
     public String getInfoname() {

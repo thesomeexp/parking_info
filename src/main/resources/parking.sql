@@ -77,8 +77,8 @@ CREATE TABLE infoImage (
   id int(11) NOT NULL AUTO_INCREMENT,
   pid int(11) NOT NULL,
   uid int(11) NOT NULL,
-  url varchar(64) NOT NULL,
   submitDate  timestamp NOT NULL,
+  state varchar(64) NOT NULL,
   PRIMARY KEY (id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 

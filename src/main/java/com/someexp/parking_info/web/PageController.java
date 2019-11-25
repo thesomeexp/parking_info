@@ -92,5 +92,16 @@ public class PageController {
     public String adminListDisableInfoPage() {
         return "admin/disableInfo";
     }
-
+    @GetMapping(value = "/adminListImagePage")
+    public String adminListImagePage(){
+        return "admin/imageHome";
+    }
+    @GetMapping(value = "/adminListNoVerifiedImagePage")
+    public String adminListNoVerifiedImagePage(){
+        return "admin/imageNoVerified";
+    }
+    @GetMapping(value = "/adminListDisableImagePage")
+    public String adminListDisableImagePage(){
+        return "admin/imageDisable";
+    }
 }

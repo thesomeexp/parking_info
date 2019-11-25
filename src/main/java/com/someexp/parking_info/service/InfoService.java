@@ -60,6 +60,8 @@ public class InfoService {
 //    @Cacheable(key="'infos-one-'+#p0")
     public Info getById(int id) {
         Info info = infoDAO.findOne(id);
+        if (info != null)
+            addUsername(info);
         return info;
     }
 
@@ -91,7 +93,7 @@ public class InfoService {
     public Page4Navigator<Info> listInfoDisadble(int start, int size, int navigatePages)throws Exception{
         Sort sort = new Sort(Sort.Direction.DESC, "id");
         Pageable pageable = new PageRequest(start, size, sort);
-        Page pageFromJPA = infoDAO.findByState(MagicVariable.INFO_DISABLE, pageable);
+        Page pageFromJPA = infoDAO.findByState(MagicVariable.DISABLE, pageable);
         List<Info> listInfo = pageFromJPA.getContent();
         addUsername(listInfo);// 得到车位提交用户名
         return new Page4Navigator<>(pageFromJPA, navigatePages);

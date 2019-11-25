@@ -23,8 +23,6 @@
             data: data4Vue,
             mounted:function(){ //mounted　表示这个 Vue 对象加载成功了
                 this.list2();
-                this.list3();
-                this.list(0);
             },
             methods: {
                 list:function(start){
@@ -35,17 +33,23 @@
                     });
                 },
                 list2:function(){
-                    var url =  "infoDetail"+ "?pid="+pid;
-                    axios.get(url).then(function(response) {
+                    var url =  "foreInfoDetail"+ "?pid="+pid;
+                    axios.get(url,  {
+                        headers: {_csrf_token: window.localStorage.getItem("_csrf_token"), timestamp: Date.parse(new Date())}
+                    }).then(function(response) {
                         var result = response.data;
                         vue.info = result.data.info;
+                        window.localStorage.setItem("_csrf_token", response.headers._csrf_token);
                     });
                 },
                 list3:function(){
-                  var url = "listInfoImages" + "?pid=" + pid;
-                    axios.get(url).then(function(response) {
+                  var url = "foreListInfoImages" + "?pid=" + pid;
+                    axios.get(url, {
+                        headers: {_csrf_token: window.localStorage.getItem("_csrf_token"), timestamp: Date.parse(new Date())}
+                    }).then(function(response) {
                         var result = response.data;
                         vue.infoImages = result.data.infoImages;
+                        window.localStorage.setItem("_csrf_token", response.headers._csrf_token);
                     });
 
                 },
@@ -76,6 +80,7 @@
             <tr>
                 <img height="40px" :src="'static/img/info/'+info.id+'.jpg'">
             </tr>
+            <a href="#nowhere"  @click="list3()">显示详情图片</a>
             <tr>
                 <td>停车场名称</td>
                 <td>{{info.name}}</td>
@@ -97,6 +102,7 @@
                 <td>{{info.state}}</td>
             </tr>
             <img height="40px" v-for="infoImage in infoImages" :src="'data/img/info_detail/'+infoImage.pid+'/'+infoImage.id+'.jpg'">
+            <img height="40px" v-for="infoImage in infoImages" :src="infoImage.url">
             <tr>
                 <td>状态更新时间</td>
                 <td>{{info.stateUpdateDate | formatDateFilter}}</td>

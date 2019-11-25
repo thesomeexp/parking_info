@@ -32,9 +32,9 @@ public class WebMvcConfigurer extends WebMvcConfigurerAdapter {
         registry.addInterceptor(getRAInterceptor()).addPathPatterns("/**").excludePathPatterns("/",
                 "/data**");
         registry.addInterceptor(getLoginInterceptor()).addPathPatterns("/**").excludePathPatterns("/",
-                "/data**", "/login", "register", "/listNearbyInfos");
+                "/data**", "/login", "/register", "/listNearbyInfos");
         registry.addInterceptor(getCSRFInterceptor()).addPathPatterns("/**").excludePathPatterns("/",
-                "/data**", "/login", "register", "/listNearbyInfos");
+                "/data**", "/login", "/register", "/listNearbyInfos");
 
     }
 }

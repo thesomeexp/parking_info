@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Enumeration;
+
 @RestController
 @ControllerAdvice
 public class GloabalExceptionHandler {
@@ -24,6 +26,19 @@ public class GloabalExceptionHandler {
         User user = (User) req.getSession().getAttribute("user");
         if (user != null)
             logger.error(MagicVariable.LOGGER_USER + user.getId());
+        logger.error(req.getRequestURI());
+        Enumeration<String> headerNames=req.getHeaderNames();
+        for(Enumeration<String> e = headerNames; e.hasMoreElements();){
+            String thisName=e.nextElement().toString();
+            String thisValue=req.getHeader(thisName);
+            logger.error("header的key:"+thisName+"--------------header的value:"+thisValue);
+        }
+        Enumeration<String> paraNames=req.getParameterNames();
+        for(Enumeration<String> e=paraNames;e.hasMoreElements();){
+            String thisName=e.nextElement().toString();
+            String thisValue=req.getParameter(thisName);
+            logger.error("param的key:"+thisName+"--------------param的value:"+thisValue);
+        }
     }
 
     @ExceptionHandler(value = Exception.class)

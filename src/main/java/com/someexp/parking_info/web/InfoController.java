@@ -219,7 +219,7 @@ public class InfoController {
     }
 
     @PostMapping("/adminVerifiedInfo")
-    public Object adminVerifiedInfo(String pid, HttpServletRequest request){
+    public Object adminVerifiedInfo(String pid) throws Exception{
         if (pid == null)
             return Result.fail(MagicVariable.PARAM_VALUES_IS_EMPTY);
         int int_pid = Integer.parseInt(pid);
@@ -234,14 +234,14 @@ public class InfoController {
     }
 
     @PostMapping("/adminDisableInfo")
-    public Object adminDisableInfo(String pid, HttpServletRequest request){
+    public Object adminDisableInfo(String pid) throws Exception{
         if (pid == null)
             return Result.fail(MagicVariable.PARAM_VALUES_IS_EMPTY);
         int int_pid = Integer.parseInt(pid);
         Info info = infoService.getById(int_pid);
         if (info == null)
             return Result.fail(MagicVariable.INFO_NOT_EXIST);
-        info.setState(MagicVariable.INFO_DISABLE);
+        info.setState(MagicVariable.DISABLE);
         infoService.update(info);
         infoService.delGeoHashCache(GeoHash.geoHashStringWithCharacterPrecision(info.getLatitude(), info.getLongitude(),
                 MagicVariable.SEARCH_GEOHASH_LIMIT));// 注解清除同区域geohash缓存
@@ -249,7 +249,7 @@ public class InfoController {
     }
 
     @PostMapping("/adminEnableInfo")
-    public Object adminEnableInfo(String pid, HttpServletRequest request){
+    public Object adminEnableInfo(String pid) throws Exception{
         if (pid == null)
             return Result.fail(MagicVariable.PARAM_VALUES_IS_EMPTY);
         int int_pid = Integer.parseInt(pid);
@@ -270,41 +270,38 @@ public class InfoController {
      * @return
      * @throws Exception
      */
-    @PostMapping("/adminDeleteInfos")
-    public Object deleteInfo(int id, HttpServletRequest request) throws Exception{
-        Info info = infoService.getById(id);
-        try {
-            infoService.delete(id);
-            infoService.delOneCache(info.getId());
-            infoService.delGeoHashCache(GeoHash.geoHashStringWithCharacterPrecision(info.getLatitude(),
-                    info.getLongitude(), MagicVariable.SEARCH_GEOHASH_LIMIT));
-        } catch (DataIntegrityViolationException e){
-            return Result.fail(MagicVariable.LOGGER_DATA_INTEGRITY_VIOLATION_EXCEPTION);// 违反约束无法删除
-        }
-        File imageFolder = new File(request.getServletContext().getRealPath(MagicVariable.INFO_IMAGE_PATH));
-        File file = new File(imageFolder, id + ".jpg");
-        file.delete();
-        return Result.success(MagicVariable.INFO_DELETE_SUCCESS);
-    }
+//    @PostMapping("/adminDeleteInfos")
+//    public Object deleteInfo(int id, HttpServletRequest request) throws Exception{
+//        Info info = infoService.getById(id);
+//        try {
+//            infoService.delete(id);
+//            infoService.delOneCache(info.getId());
+//            infoService.delGeoHashCache(GeoHash.geoHashStringWithCharacterPrecision(info.getLatitude(),
+//                    info.getLongitude(), MagicVariable.SEARCH_GEOHASH_LIMIT));
+//        } catch (DataIntegrityViolationException e){
+//            return Result.fail(MagicVariable.LOGGER_DATA_INTEGRITY_VIOLATION_EXCEPTION);// 违反约束无法删除
+//        }
+//        File imageFolder = new File(request.getServletContext().getRealPath(MagicVariable.INFO_IMAGE_PATH));
+//        File file = new File(imageFolder, id + ".jpg");
+//        file.delete();
+//        return Result.success(MagicVariable.INFO_DELETE_SUCCESS);
+//    }
 
 
     /**
      * 根据传来的pid返回该停车场详情
      * 验证登录, 参数, 是否存在
      * 根据id获取一个info
-     * 为info添加提交者名字
      * @param pid
      * @param request
      * @return
      * @throws Exception
      */
-    @GetMapping("infoDetail")
+    @GetMapping("/foreInfoDetail")
     public Object infoDetail(@RequestParam(value = "pid") String pid, HttpServletRequest request) throws Exception {
         User user = (User) request.getSession().getAttribute("user");
-        if (user == null)
-            return Result.fail(MagicVariable.UN_LOGIN);
         if (MyTools.isStringEmpty(pid))
-            return Result.fail(MagicVariable.BAD_REQUEST);
+            return Result.fail(MagicVariable.PARAM_VALUES_IS_EMPTY);
 
         int int_pid = Integer.parseInt(pid);
         if (!infoService.isPidExist(int_pid))
@@ -313,7 +310,6 @@ public class InfoController {
         req_map.put("pid", pid);
 
         Info info = infoService.getById(int_pid);
-        infoService.addUsername(info);
 
         Map<String, Object> data_map = new HashMap<>();
         data_map.put("info", info);
