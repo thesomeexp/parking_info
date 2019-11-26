@@ -6,7 +6,7 @@
 <script>
     $(function(){
         var data4Vue = {
-            uri:'addReview',
+            uri:'foreAddReview',
             bean:{pid:'', accuracy:'', easyToFind:'', content:''}
         };
 
@@ -19,14 +19,6 @@
             },
             methods: {
                 add: function () {
-                    if(!checkEmpty(this.bean.pid, "pid"))
-                        return;
-                    if(!checkEmpty(this.bean.accuracy, "accuracy"))
-                        return;
-                    if(!checkEmpty(this.bean.easyToFind, "easyToFind"))
-                        return;
-                    if(!checkEmpty(this.bean.content, "content"))
-                        return;
                     var url = this.uri;
                     //axios.js 上传文件要用 formData 这种方式
                     var formData = new FormData();
@@ -34,8 +26,11 @@
                     formData.append("accuracy", this.bean.accuracy);
                     formData.append("easyToFind", this.bean.easyToFind);
                     formData.append("content", this.bean.content);
-                    axios.post(url,formData).then(function(response){
+                    axios.post(url, formData,
+                        {headers: {"timestamp": Date.parse(new Date()), "_csrf_token": window.localStorage.getItem("_csrf_token")}}
+                    ).then(function(response){
                         vue.bean = {pid:'',accuracy:'',easyToFind:'',content:''};
+                        window.localStorage.setItem("_csrf_token", response.headers._csrf_token);
                     });
                 }
 

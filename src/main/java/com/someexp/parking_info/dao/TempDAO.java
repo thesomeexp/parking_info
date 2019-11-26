@@ -10,5 +10,5 @@ public interface TempDAO extends JpaRepository<Temp,Integer> {
 
     public Temp findById(int id);
 
-    public List<Temp> findBySubmitDateBetween(Date date1, Date date2);
+    public List<Temp> findByPidAndSubmitDateBetween(int pid, Date date1, Date date2);
 }

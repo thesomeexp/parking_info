@@ -26,10 +26,14 @@
             },
             methods: {
                 list:function(start){
-                    var url =  'listReviews' + "?pid="+pid+"&start="+start;
-                    axios.get(url).then(function(response) {
+                    var url =  'foreListReviews' + "?pid="+pid+"&start=" + start
+                    axios.get(url, {
+                            headers: {_csrf_token: window.localStorage.getItem("_csrf_token"), timestamp: Date.parse(new Date())}
+                        }
+                    ).then(function(response) {
                         vue.pagination = response.data.data;
                         vue.reviews = response.data.data.content;
+                        window.localStorage.setItem("_csrf_token", response.headers._csrf_token);
                     });
                 },
                 list2:function(){
@@ -81,6 +85,7 @@
                 <img height="40px" :src="'static/img/info/'+info.id+'.jpg'">
             </tr>
             <a href="#nowhere"  @click="list3()">显示详情图片</a>
+            <a href="#nowhere"  @click="list(0)">显示评论</a>
             <tr>
                 <td>停车场名称</td>
                 <td>{{info.name}}</td>

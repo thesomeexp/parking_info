@@ -27,11 +27,9 @@ public class ReviewController {
     @Autowired
     InfoService infoService;
 
-    @PostMapping("/addReview")
+    @PostMapping("/foreAddReview")
     public Object addInfo(String pid, String accuracy, String easyToFind, String content, HttpServletRequest request) throws Exception {
         User user = (User) request.getSession().getAttribute("user");
-        if (user == null)
-            return Result.fail(MagicVariable.UN_LOGIN);
 
         if (MyTools.isStringEmpty(pid, accuracy, easyToFind))
             return Result.fail(MagicVariable.BAD_REQUEST);
@@ -60,14 +58,12 @@ public class ReviewController {
         return Result.success(MagicVariable.REVIEW_ADD_SUCCESS);
     }
 
-    @GetMapping("/listReviews")
+    @GetMapping("/foreListReviews")
     public Object list(@RequestParam(value = "pid") String pid,
                        @RequestParam(value = "start", defaultValue = "0") String start,
                        @RequestParam(value = "size", defaultValue = "5") String size,
+                       @RequestParam(value = "navigatePage", defaultValue = "5") String navigatePage,
                        HttpServletRequest request) throws Exception {
-        User user = (User) request.getSession().getAttribute("user");
-        if (user == null)
-            return Result.fail(MagicVariable.UN_LOGIN);
         if (MyTools.isStringEmpty(pid, start, size))
             return Result.fail(MagicVariable.BAD_REQUEST);
 
@@ -78,10 +74,13 @@ public class ReviewController {
         req_map.put("pid", pid);
         req_map.put("start", start);
         req_map.put("size", size);
+        req_map.put("navigatePage", navigatePage);
         int int_start = Integer.parseInt(start);
         int_start = int_start<0?0:int_start;
         int int_size = Integer.parseInt(size);
-        Page4Navigator<Review> page =reviewService.list(int_pid, int_start, int_size, 5);  //5表示导航分页最多有5个，像 [1,2,3,4,5] 这样
+        int_size = int_size<0?0:int_size;
+        int int_navigatePage = Integer.parseInt(navigatePage);
+        Page4Navigator<Review> page =reviewService.list(int_pid, int_start, int_size, int_navigatePage);  //5表示导航分页最多有5个，像 [1,2,3,4,5] 这样
         return Result.success(page, req_map);
     }
 

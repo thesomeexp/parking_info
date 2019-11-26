@@ -1,6 +1,7 @@
 package com.someexp.parking_info.util;
 
 
+import ch.hsr.geohash.GeoHash;
 import org.slf4j.LoggerFactory;
 
 public class MyTools {
@@ -57,4 +58,13 @@ public class MyTools {
         return true;
     }
 
+    public static boolean isUserGeoHashInArray(String userGeoHash, String infoGeoHash, GeoHash[] arryGeoHash) {
+        if (userGeoHash.equals(infoGeoHash))
+            return true;
+        for (GeoHash geoHash : arryGeoHash){
+            if (geoHash.toBase32().equals(userGeoHash))
+                return true;
+        }
+        return false;
+    }
 }

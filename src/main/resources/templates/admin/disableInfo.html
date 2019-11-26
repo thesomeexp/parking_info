@@ -62,13 +62,12 @@
                     axios.post(url, formData,
                         {headers: {"_csrf_token": window.localStorage.getItem("_csrf_token"), "timestamp": timestamp}}).then(function(response) {
                         var result = response.data;
-                        var _csrf_token = response.headers._csrf_token;
                         if (result.status == "success") {
                             alert('verified success')
                         } else {
                             alert(result.message)
                         }
-                        window.localStorage.setItem("_csrf_token", _csrf_token);
+                        window.localStorage.setItem("_csrf_token", response.headers._csrf_token);
                     })
                 },
                 jump: function(page){

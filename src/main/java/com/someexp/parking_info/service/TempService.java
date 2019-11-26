@@ -21,8 +21,8 @@ public class TempService {
         return tempDAO.findById(id);
     }
 
-    public List<Temp> getBySubmitDateBetween(Date date1, Date date2) {
-        return tempDAO.findBySubmitDateBetween(date1, date2);
+    public List<Temp> getByPidAndSubmitDateBetween(int pid, Date date1, Date date2) {
+        return tempDAO.findByPidAndSubmitDateBetween(pid, date1, date2);
     }
 
 

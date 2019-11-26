@@ -6,7 +6,7 @@
 <script>
     $(function(){
         var data4Vue = {
-            uri:'mySubmitInfos',
+            uri:'foreMySubmitInfos',
             pagination:{},
             beans: []
         };
@@ -21,7 +21,11 @@
             methods: {
                 list:function(start){
                     var url =  this.uri+ "?start="+start;
-                    axios.get(url).then(function(response) {
+                    axios.get(url, {
+                            headers: {_csrf_token: window.localStorage.getItem("_csrf_token"), timestamp: Date.parse(new Date())}
+                        }
+                    ).then(function(response) {
+                        window.localStorage.setItem("_csrf_token", response.headers._csrf_token);
                         vue.pagination = response.data.data;
                         vue.beans = response.data.data.content;
                     });
@@ -75,14 +79,13 @@
                 <th>用户id</th>
                 <th>提交时间</th>
                 <th>状态</th>
-                <th>删除</th>
             </tr>
             </thead>
             <tbody>
             <tr v-for="bean in beans ">
                 <td>{{bean.id}}</td>
                 <td>
-                    <img height="40px"  :src="'img/info/'+bean.id+'.jpg'">
+                    <img height="40px"  :src="'static/img/info/'+bean.id+'.jpg'">
                 </td>
                 <td>
                     {{bean.name}}
@@ -100,9 +103,6 @@
                     {{bean.infoSubmitDate  | formatDateFilter}}
                 </td>
                 <td>{{bean.state}}</td>
-                <td>
-                    <a href="#nowhere"  @click="deleteBean(bean.id)">删除</span></a>
-                </td>
             </tr>
             </tbody>
         </table>

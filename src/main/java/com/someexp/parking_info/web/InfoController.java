@@ -323,27 +323,29 @@ public class InfoController {
      * 根据uid和分页情况查询数据
      * 返回查询的分页信息
       */
-    @GetMapping("/mySubmitInfos")
+    @GetMapping("/foreMySubmitInfos")
     public Object mySubmitInfos(@RequestParam(value = "start", defaultValue = "0") String start,
                                 @RequestParam(value = "size", defaultValue = "5") String size,
+                                @RequestParam(value = "navigatePage", defaultValue = "5") String navigatePage,
                                 HttpSession session) throws Exception{
         User user = (User) session.getAttribute("user");
-        if (user == null)
-            return Result.fail(MagicVariable.UN_LOGIN);
         if (MyTools.isStringEmpty(start, size))
             return Result.fail(MagicVariable.BAD_REQUEST);
 
         Map<String, String> req_map = new HashMap<>();
         req_map.put("start", start);
         req_map.put("size", size);
+        req_map.put("navigatePage", navigatePage);
         int int_start = Integer.parseInt(start);
         int_start = int_start<0?0:int_start;
         int int_size = Integer.parseInt(size);
+        int_size = int_size<1?1:int_size;
+        int int_navigatePage = Integer.parseInt(navigatePage);
 
         Sort sort = new Sort(Sort.Direction.DESC, "id");
         Pageable pageable = new PageRequest(int_start, int_size, sort);
         Page pageFromJPA = infoService.listInfoByUidOrderBySubmitDateDesc(user.getId(), pageable);
-        Page4Navigator page = new Page4Navigator<Info> (pageFromJPA, 5);
+        Page4Navigator page = new Page4Navigator<Info> (pageFromJPA, int_navigatePage);
         return Result.success(page, req_map);
     }
 

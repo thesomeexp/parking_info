@@ -70,7 +70,7 @@ public class MagicVariable {
     public static final String LOCATION_NOT_NEAR_PARKING = "你不在该停车位附近,无法提交信息";
 
     public static final String DEFAULT_REVIEW = "用户评价为空";
-    public static final String STAR_ILLEGAL = "用户评分不合法";
+    public static final String STAR_ILLEGAL = "评分不合法";
     public static final String LOCATION_ILLEGAL = "坐标不合法";
     public static final String LOCATION_IS_EMPTY = "坐标为空";
     public static final String STAR_IS_EMPTY = "评分为空";
@@ -78,6 +78,7 @@ public class MagicVariable {
 
     public static final int SEARCH_GEOHASH_LIMIT = 6;
     public static final int INFO_GEOHASH_LIMIT = 7;
+    public static final int ADD_TEMP_GEOHASH_LIMIT = 7;
 
     public static final long REPLAY_ATTACK_INTERVAL = 60000;
     public static final String REPLAY_ATTACK_DETECT = "检测到重放攻击";
