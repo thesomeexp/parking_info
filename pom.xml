@@ -165,6 +165,7 @@
                 <version>3.1</version>
                 <configuration>
                     <fork>true</fork>
+<!--                    下面是你打包利用到的javac的路径-->
                     <executable>C:\Users\i\.jdks\adopt-openj9-1.8.0_252\bin\javac.exe</executable>
                 </configuration>
             </plugin>
