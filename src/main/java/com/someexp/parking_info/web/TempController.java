@@ -46,7 +46,7 @@ public class TempController {
         double y = xyArray[1];
         int int_pid = Integer.parseInt(pid);
         int int_state = Integer.parseInt(state);
-        if (!MyTools.isStarLegal(int_state))
+        if (!MyTools.isStateLegal(int_state))
             return Result.fail(MagicVariable.INFO_STATE_IS_ERROR);
         if (!MyTools.isXYLegal(x, y))
             return Result.fail(MagicVariable.INFO_LOCATION_ILLEGAL);
