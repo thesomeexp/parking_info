@@ -1,3 +1,6 @@
+# 基于众包车位信息服务模式探索研究(单体)
+微服务版本: [基于众包车位信息服务模式探索研究(微服务)](https://github.com/thesomeexp/ParkingCloud)
+
 ## 该SpringBoot项目说明
 ### 1.先配置安装maven，maven的库可以下载这个：
 http://how2j.cn/k/maven/maven-repositories/1330.html
