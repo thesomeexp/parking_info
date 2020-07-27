@@ -2,10 +2,7 @@
 微服务版本: [基于众包车位信息服务模式探索研究(微服务)](https://github.com/thesomeexp/ParkingCloud)
 
 ## 该SpringBoot项目说明
-### 1.先配置安装maven，maven的库可以下载这个：
-http://how2j.cn/k/maven/maven-repositories/1330.html
-
-这个网站右上角的repository。
+### 1.先配置安装maven：
 
 SpringBoot默认JDK1.8
 
