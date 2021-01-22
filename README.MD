@@ -1,6 +1,8 @@
 # 基于众包车位信息服务模式探索研究(单体)
 微服务版本: [基于众包车位信息服务模式探索研究(微服务)](https://github.com/thesomeexp/ParkingCloud)
 
+该项目是通过众包方式采集各公共停车位相关数据, 建立停车位拥挤度模型, 并向用户提供停车位的拥挤度信息. 项目后端由我独立开发. 它使用SpringBoot + Thymeleaf 混合 Vue.js 做架构, Bootstrap做页面美化, 使用GeoHash做停车位坐标存储和查询, Redis做中间缓存以降低数据库压力, Shiro框架做用户和管理员的权限控制.  对XSS, CSRF, 重放攻击并做了简单的防御. 
+
 ## 该SpringBoot项目说明
 ### 1.先配置安装maven：
 
