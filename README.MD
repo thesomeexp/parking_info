@@ -1,3 +1,7 @@
+# 此项目已废弃
+
+此版本不再更新了, 最新的是单体的版本[点击这里前往](https://github.com/thesomeexp/ParkingProject)
+
 # 基于众包车位信息服务模式探索研究(单体)
 微服务版本: [基于众包车位信息服务模式探索研究(微服务)](https://github.com/thesomeexp/ParkingCloud)
 
